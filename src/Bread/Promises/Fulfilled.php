@@ -12,33 +12,33 @@
  * @since      Bread PHP Framework
  * @license    http://creativecommons.org/licenses/by/3.0/
  */
-
 namespace Bread\Promises;
 
 use Exception;
 
-class Fulfilled implements Interfaces\Promise {
-  use Traits\PromiseFor;
+class Fulfilled implements Interfaces\Promise
+{
+    use Traits\PromiseFor;
 
-  private $result;
+    private $result;
 
-  public function __construct($result = null) {
-    $this->result = $result;
-  }
-
-  public function then($fulfilledHandler = null, $errorHandler = null,
-    $progressHandler = null) {
-    try {
-      $result = $this->result;
-      if (is_callable($fulfilledHandler)) {
-        $result = call_user_func($fulfilledHandler, $result);
-      }
-      elseif (null !== $fulfilledHandler) {
-        trigger_error('Invalid $fulfilledHandler argument passed to then(), must be null or callable.', E_USER_NOTICE);
-      }
-      return static::promiseFor($result);
-    } catch (Exception $exception) {
-      return new Rejected($exception);
+    public function __construct($result = null)
+    {
+        $this->result = $result;
     }
-  }
+
+    public function then($fulfilledHandler = null, $errorHandler = null, $progressHandler = null)
+    {
+        try {
+            $result = $this->result;
+            if (is_callable($fulfilledHandler)) {
+                $result = call_user_func($fulfilledHandler, $result);
+            } elseif (null !== $fulfilledHandler) {
+                trigger_error('Invalid $fulfilledHandler argument passed to then(), must be null or callable.', E_USER_NOTICE);
+            }
+            return static::promiseFor($result);
+        } catch (Exception $exception) {
+            return new Rejected($exception);
+        }
+    }
 }

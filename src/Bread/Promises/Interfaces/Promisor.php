@@ -12,9 +12,10 @@
  * @since      Bread PHP Framework
  * @license    http://creativecommons.org/licenses/by/3.0/
  */
-
 namespace Bread\Promises\Interfaces;
 
-interface Promisor {
-  public function promise();
+interface Promisor
+{
+
+    public function promise();
 }

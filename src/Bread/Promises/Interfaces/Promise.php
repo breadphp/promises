@@ -12,10 +12,10 @@
  * @since      Bread PHP Framework
  * @license    http://creativecommons.org/licenses/by/3.0/
  */
-
 namespace Bread\Promises\Interfaces;
 
-interface Promise {
-  public function then($fulfilledHandler = null, $errorHandler = null,
-    $progressHandler = null);
+interface Promise
+{
+
+    public function then($fulfilledHandler = null, $errorHandler = null, $progressHandler = null);
 }

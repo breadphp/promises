@@ -12,28 +12,33 @@
  * @since      Bread PHP Framework
  * @license    http://creativecommons.org/licenses/by/3.0/
  */
-
 namespace Bread\Promises\Deferred;
 
 use Bread\Promises\Deferred;
 use Bread\Promises\Interfaces;
 
-class Resolver implements Interfaces\Resolver {
-  private $deferred;
+class Resolver implements Interfaces\Resolver
+{
 
-  public function __construct(Deferred $deferred) {
-    $this->deferred = $deferred;
-  }
+    private $deferred;
 
-  public function resolve($result = null) {
-    return $this->deferred->resolve($result);
-  }
+    public function __construct(Deferred $deferred)
+    {
+        $this->deferred = $deferred;
+    }
 
-  public function reject($reason = null) {
-    return $this->deferred->reject($reason);
-  }
+    public function resolve($result = null)
+    {
+        return $this->deferred->resolve($result);
+    }
 
-  public function progress($update = null) {
-    return $this->deferred->progress($update);
-  }
+    public function reject($reason = null)
+    {
+        return $this->deferred->reject($reason);
+    }
+
+    public function progress($update = null)
+    {
+        return $this->deferred->progress($update);
+    }
 }

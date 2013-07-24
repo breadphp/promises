@@ -12,91 +12,105 @@
  * @since      Bread PHP Framework
  * @license    http://creativecommons.org/licenses/by/3.0/
  */
-
 namespace Bread\Promises;
 
 use Exception;
 
-class Deferred implements Interfaces\Promise, Interfaces\Resolver,
-  Interfaces\Promisor {
-  use Traits\PromiseFor;
+class Deferred implements Interfaces\Promise, Interfaces\Resolver, Interfaces\Promisor
+{
+    use Traits\PromiseFor;
 
-  private $completed;
-  private $promise;
-  private $resolver;
-  private $handlers = array();
-  private $progressHandlers = array();
+    private $completed;
 
-  public function then($fulfilledHandler = null, $errorHandler = null,
-    $progressHandler = null) {
-    if (null !== $this->completed) {
-      return $this->completed->then($fulfilledHandler, $errorHandler, $progressHandler);
-    }
-    $deferred = new static();
-    if (is_callable($progressHandler)) {
-      $progHandler = function ($update) use ($deferred, $progressHandler) {
-        try {
-          $deferred->progress(call_user_func($progressHandler, $update));
-        } catch (Exception $e) {
-          $deferred->progress($e);
+    private $promise;
+
+    private $resolver;
+
+    private $handlers = array();
+
+    private $progressHandlers = array();
+
+    public function then($fulfilledHandler = null, $errorHandler = null, $progressHandler = null)
+    {
+        if (null !== $this->completed) {
+            return $this->completed->then($fulfilledHandler, $errorHandler, $progressHandler);
         }
-      };
+        $deferred = new static();
+        if (is_callable($progressHandler)) {
+            $progHandler = function ($update) use ($deferred, $progressHandler) {
+                try {
+                    $deferred->progress(call_user_func($progressHandler, $update));
+                } catch (Exception $e) {
+                    $deferred->progress($e);
+                }
+            };
+        } else {
+            if (null !== $progressHandler) {
+                trigger_error('Invalid $progressHandler argument passed to then(), must be null or callable.', E_USER_NOTICE);
+            }
+            $progHandler = array(
+                $deferred,
+                'progress'
+            );
+        }
+        $this->handlers[] = function ($promise) use($fulfilledHandler, $errorHandler, $deferred, $progHandler)
+        {
+            $promise->then($fulfilledHandler, $errorHandler)->then(array(
+                $deferred,
+                'resolve'
+            ), array(
+                $deferred,
+                'reject'
+            ), $progHandler);
+        };
+        $this->progressHandlers[] = $progHandler;
+        return $deferred->promise();
     }
-    else {
-      if (null !== $progressHandler) {
-        trigger_error('Invalid $progressHandler argument passed to then(), must be null or callable.', E_USER_NOTICE);
-      }
-      $progHandler = array($deferred, 'progress');
-    }
-    $this->handlers[] = function ($promise) use ($fulfilledHandler,
-      $errorHandler, $deferred, $progHandler) {
-      $promise->then($fulfilledHandler, $errorHandler)->then(array(
-        $deferred,
-        'resolve'
-      ), array($deferred, 'reject'), $progHandler);
-    };
-    $this->progressHandlers[] = $progHandler;
-    return $deferred->promise();
-  }
 
-  public function resolve($result = null) {
-    if (null !== $this->completed) {
-      return static::promiseFor($result);
+    public function resolve($result = null)
+    {
+        if (null !== $this->completed) {
+            return static::promiseFor($result);
+        }
+        $this->completed = static::promiseFor($result);
+        $this->processQueue($this->handlers, $this->completed);
+        $this->progressHandlers = $this->handlers = array();
+        return $this->completed;
     }
-    $this->completed = static::promiseFor($result);
-    $this->processQueue($this->handlers, $this->completed);
-    $this->progressHandlers = $this->handlers = array();
-    return $this->completed;
-  }
 
-  public function reject($reason = null) {
-    return $this->resolve(static::rejectedPromiseFor($reason));
-  }
-
-  public function progress($update = null) {
-    if (null !== $this->completed) {
-      return;
+    public function reject($reason = null)
+    {
+        return $this->resolve(static::rejectedPromiseFor($reason));
     }
-    $this->processQueue($this->progressHandlers, $update);
-  }
 
-  public function promise() {
-    if (null === $this->promise) {
-      $this->promise = new Deferred\Promise($this);
+    public function progress($update = null)
+    {
+        if (null !== $this->completed) {
+            return;
+        }
+        $this->processQueue($this->progressHandlers, $update);
     }
-    return $this->promise;
-  }
 
-  public function resolver() {
-    if (null === $this->resolver) {
-      $this->resolver = new Deferred\Resolver($this);
+    public function promise()
+    {
+        if (null === $this->promise) {
+            $this->promise = new Deferred\Promise($this);
+        }
+        return $this->promise;
     }
-    return $this->resolver;
-  }
 
-  protected function processQueue($queue, $value) {
-    foreach ($queue as $handler) {
-      call_user_func($handler, $value);
+    public function resolver()
+    {
+        if (null === $this->resolver) {
+            $this->resolver = new Deferred\Resolver($this);
+        }
+        return $this->resolver;
     }
-  }
+
+    protected function processQueue($queue, $value)
+    {
+        foreach ($queue as $handler) {
+            call_user_func($handler, $value);
+        }
+    }
 }

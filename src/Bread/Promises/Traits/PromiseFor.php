@@ -12,26 +12,29 @@
  * @since      Bread PHP Framework
  * @license    http://creativecommons.org/licenses/by/3.0/
  */
-
 namespace Bread\Promises\Traits;
 
 use Bread\Promises;
 use Bread\Promises\Interfaces;
 
-trait PromiseFor {
-  public static function promiseFor($promiseOrValue) {
-    if ($promiseOrValue instanceof Interfaces\Promise) {
-      return $promiseOrValue;
-    }
-    return new Promises\Fulfilled($promiseOrValue);
-  }
+trait PromiseFor
+{
 
-  public static function rejectedPromiseFor($promiseOrValue) {
-    if ($promiseOrValue instanceof Interfaces\Promise) {
-      return $promiseOrValue->then(function ($value) {
-        return new Promises\Rejected($value);
-      });
+    public static function promiseFor($promiseOrValue)
+    {
+        if ($promiseOrValue instanceof Interfaces\Promise) {
+            return $promiseOrValue;
+        }
+        return new Promises\Fulfilled($promiseOrValue);
     }
-    return new Promises\Rejected($promiseOrValue);
-  }
+
+    public static function rejectedPromiseFor($promiseOrValue)
+    {
+        if ($promiseOrValue instanceof Interfaces\Promise) {
+            return $promiseOrValue->then(function ($value) {
+                return new Promises\Rejected($value);
+            });
+        }
+        return new Promises\Rejected($promiseOrValue);
+    }
 }

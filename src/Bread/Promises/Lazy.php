@@ -17,27 +17,29 @@ namespace Bread\Promises;
 
 use Exception;
 
-class Lazy implements Interfaces\Promise {
-  use Traits\PromiseFor;
+class Lazy implements Interfaces\Promise
+{
+    use Traits\PromiseFor;
 
-  private $factory;
+    private $factory;
 
-  private $promise;
+    private $promise;
 
-  public function __construct($factory) {
-    $this->factory = $factory;
-  }
-
-  public function then($fulfilledHandler = null, $errorHandler = null,
-    $progressHandler = null) {
-    if (null === $this->promise) {
-      try {
-        $this->promise = static::promiseFor(call_user_func($this->factory));
-      } catch (Exception $exception) {
-        $this->promise = new Rejected($exception);
-      }
+    public function __construct($factory)
+    {
+        $this->factory = $factory;
     }
 
-    return $this->promise->then($fulfilledHandler, $errorHandler, $progressHandler);
-  }
+    public function then($fulfilledHandler = null, $errorHandler = null, $progressHandler = null)
+    {
+        if (null === $this->promise) {
+            try {
+                $this->promise = static::promiseFor(call_user_func($this->factory));
+            } catch (Exception $exception) {
+                $this->promise = new Rejected($exception);
+            }
+        }
+        
+        return $this->promise->then($fulfilledHandler, $errorHandler, $progressHandler);
+    }
 }

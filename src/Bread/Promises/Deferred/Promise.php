@@ -12,21 +12,23 @@
  * @since      Bread PHP Framework
  * @license    http://creativecommons.org/licenses/by/3.0/
  */
-
 namespace Bread\Promises\Deferred;
 
 use Bread\Promises\Deferred;
 use Bread\Promises\Interfaces;
 
-class Promise implements Interfaces\Promise {
-  private $deferred;
+class Promise implements Interfaces\Promise
+{
 
-  public function __construct(Deferred $deferred) {
-    $this->deferred = $deferred;
-  }
+    private $deferred;
 
-  public function then($fulfilledHandler = null, $errorHandler = null,
-    $progressHandler = null) {
-    return $this->deferred->then($fulfilledHandler, $errorHandler, $progressHandler);
-  }
+    public function __construct(Deferred $deferred)
+    {
+        $this->deferred = $deferred;
+    }
+
+    public function then($fulfilledHandler = null, $errorHandler = null, $progressHandler = null)
+    {
+        return $this->deferred->then($fulfilledHandler, $errorHandler, $progressHandler);
+    }
 }

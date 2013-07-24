@@ -12,11 +12,14 @@
  * @since      Bread PHP Framework
  * @license    http://creativecommons.org/licenses/by/3.0/
  */
-
 namespace Bread\Promises\Interfaces;
 
-interface Resolver {
-  public function resolve($result = null);
-  public function reject($reason = null);
-  public function progress($update = null);
+interface Resolver
+{
+
+    public function resolve($result = null);
+
+    public function reject($reason = null);
+
+    public function progress($update = null);
 }
