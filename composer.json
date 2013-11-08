@@ -8,8 +8,10 @@
 		}
 	],
 	"keywords" : [
+		"bread",
 		"promises"
 	],
+	"homepage" : "https://github.com/breadphp/promises",
 	"license" : [
 		"CC-BY-3.0"
 	],
